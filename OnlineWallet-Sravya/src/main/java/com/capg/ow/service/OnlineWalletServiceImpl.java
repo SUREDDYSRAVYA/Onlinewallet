@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.capg.ow.entity.OnlineWallet;
+import com.capg.ow.exception.OnlineWalletNotFoundException;
 import com.capg.ow.repository.OnlineWalletJpaRepo;
 
 
@@ -20,9 +21,7 @@ public class OnlineWalletServiceImpl implements IOnlineWalletService {
 		public OnlineWallet addAmount(int customerId, int accountBalance) {
 			Optional<OnlineWallet> onlinewallet=repository.findById(customerId);
 			OnlineWallet wallet = new OnlineWallet();
-//			int amount= accountBalance+onlinewallet.get().getAccountBalance();
-//			onlinewallet.get().setAccountBalance(amount);
-			
+	
 			wallet.setCustomerId(onlinewallet.get().getCustomerId());
 			wallet.setCustomerName(onlinewallet.get().getCustomerName());
 			wallet.setAccountBalance(accountBalance+onlinewallet.get().getAccountBalance());
@@ -40,9 +39,14 @@ public class OnlineWalletServiceImpl implements IOnlineWalletService {
 		
 	   /* shows the wallet of particular id*/
 		@Override
-		public Optional<OnlineWallet> findOnlineWalletById(int customerId ) {
-			System.out.println(customerId);
-			return repository.findById(customerId);
+		public OnlineWallet findOnlineWalletById(int customerId ) {
+			
+			if(repository.findById(customerId).isPresent()) {
+				
+			}else {
+				throw new OnlineWalletNotFoundException("onlinewallet not found for id");
+			}
+			return repository.findById(customerId).get();
 			
 		}
 

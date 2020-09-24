@@ -2,11 +2,14 @@ package com.capg.ow.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +23,7 @@ import com.capg.ow.exception.OnlineWalletNotFoundException;
 import com.capg.ow.service.OnlineWalletServiceImpl;
 
 @RestController
-@RequestMapping( "/onlinewallet" )
+@RequestMapping( "/onlinewallet" ) //used to map http request to the handler methods
 @CrossOrigin("http://localhost:4200")
 public class OnlineWalletRestController {
 	
@@ -37,33 +40,32 @@ public class OnlineWalletRestController {
 		}
 		
 		
-		@PostMapping(path = "/create")
-		public ResponseEntity<OnlineWallet> createOnlineWallet(@RequestBody OnlineWallet onlinewalletbean)
-				throws Exception {
+		@PostMapping(path = "/create")                               //used to bind http request to the object in method
+		public ResponseEntity<OnlineWallet> createOnlineWallet(@Valid @RequestBody OnlineWallet onlinewalletbean)
+				 {
 			
 			OnlineWallet onlinewallet = service.createOnlineWallet(onlinewalletbean);
-			if (onlinewallet == null) {
-				throw new OnlineWalletNotFoundException("Values should not be null");
-			}
+			ResponseEntity<OnlineWallet> responseEntity = new ResponseEntity<OnlineWallet>(onlinewallet, new HttpHeaders(), HttpStatus.OK);
 
-			return new ResponseEntity<OnlineWallet>(onlinewallet, new HttpHeaders(), HttpStatus.OK);
+			return responseEntity;
 		}
 		
 		/* the findOnlineWalletById method is meant to show details of one particular id */
 
 		@GetMapping(path = "/showBalance/{customerId}")
-		public Optional<OnlineWallet> findOnlineWalletById(@PathVariable("customerId") int customerId)
+		public ResponseEntity<OnlineWallet> findOnlineWalletById(@PathVariable("customerId") int customerId)
 		{
-			System.out.println(customerId);
-			Optional<OnlineWallet> onlinewallet = service.findOnlineWalletById(customerId);
-			if (onlinewallet == null) {
-				throw new OnlineWalletNotFoundException("onlinewallet not found for id");
-			}else {
-			return onlinewallet;
-          
-		}
-			
+			try {
+			OnlineWallet onlinewallet = service.findOnlineWalletById(customerId);
+			ResponseEntity<OnlineWallet> responseEntity =new ResponseEntity(onlinewallet,HttpStatus.OK);
+          System.out.println("response entity="+responseEntity);
+          return responseEntity;
+		}catch(Exception e)
+			{
+			System.err.println("Invalid customer id");
+			return new ResponseEntity("Invalid customer id",HttpStatus.BAD_REQUEST);
 			}
+		}
 		@GetMapping(value = "/GetAllDetails")
 		public ResponseEntity<List<OnlineWallet>> getAlldetails() {
 			
@@ -71,4 +73,8 @@ public class OnlineWalletRestController {
 			
 			System.out.println(onlineewallet);
 			return new ResponseEntity<List<OnlineWallet>>(onlineewallet, HttpStatus.OK);
-}}
+}
+		@ExceptionHandler
+		public String inValidInput(Exception e) {
+			return e.getMessage();
+		}}

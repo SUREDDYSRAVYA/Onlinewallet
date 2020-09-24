@@ -8,7 +8,7 @@ import com.capg.ow.entity.OnlineWallet;
 public interface IOnlineWalletService {
 public OnlineWallet createOnlineWallet(OnlineWallet onlinewalletbean);
     public OnlineWallet addAmount(int customerId,int accountBalance);
-    Optional<OnlineWallet>  findOnlineWalletById(int customerId );
+   public OnlineWallet  findOnlineWalletById(int customerId );
     List<OnlineWallet> getAlldetails();
 }
 

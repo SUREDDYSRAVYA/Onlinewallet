@@ -8,7 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+
 import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.Pattern;
@@ -18,25 +20,25 @@ import com.sun.istack.NotNull;
 
 @Entity
 @Table(name = "Onlinewallet_Spring")
-public class OnlineWallet implements Serializable {
+public class OnlineWallet {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private int customerId;
 	
 	@NotEmpty(message = "password must not be empty")
-	@Size(min = 4, message = "passoword should have atleast 5 characters")
-	@Column(name = "customerPassword", nullable = false)
+	@Size(min = 4, message = "passoword should have atleast 4 characters")
+	//@Column(name = "customerPassword", nullable = false)
 	private String customerPassword;
 	
-	@NotEmpty(message = "first name must not be empty")
-	@Size(min = 3, message = "Name should have atleast 5 characters")
-	@Column(name = "customerName", nullable = false)
- @Pattern(regexp = "^[A-Za-z]*$")
-	
+	@NotEmpty(message="Name is mandatory field. pleaser provide name")
+	@Size(min = 3, message = "Name should have atleast 3 characters")
+	//@Column(name = "customerName", nullable = false)
+    @Pattern(regexp = "^[A-Za-z]*$")
 	private String customerName;
 	
 	@NotNull
 	 @Min(value=1,message="Account Balance cannot be less than 1")
+	@Max(value=100000,message="Account Balance cannot be greater than 100000")
 	private int accountBalance;
 
 	public int getCustomerId() {
